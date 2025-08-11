@@ -2,6 +2,48 @@
 
 This is a repository dedicated to using opensource models locally on your machine - whether that be a mac or windows laptop. Given hardware limitations the focus is to be able to get a smaller version running that will be compatiable with most systems. Then evaluate its usefullness - possibly with automation and a web agent.
 
+## 🚀 Quickstart
+
+### 1. Create and Activate a Virtual Environment
+
+It is highly recommended to use a Python virtual environment for this project. This keeps dependencies isolated and your system clean.
+
+#### On macOS/Linux:
+```sh
+python -m venv .venv
+source .venv/bin/activate
+```
+
+#### On Windows (CMD):
+```bat
+python -m venv .venv
+.venv\Scripts\activate
+```
+
+#### On Windows (PowerShell):
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
+### 2. Install Requirements
+```sh
+pip install -r requirements.txt
+```
+
+### 3. Accessing the Virtual Environment
+
+Once activated, your terminal prompt will usually change to show `(.venv)` at the beginning. While the environment is active:
+
+- All Python and pip commands will use the isolated environment.
+- To leave the virtual environment, simply run:
+
+```sh
+deactivate
+```
+
+If you open a new terminal, remember to activate the environment again before running any project commands.
+
 ## Design Choices
 
 ### Model Selection
