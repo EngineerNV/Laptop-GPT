@@ -1,6 +1,6 @@
 # Core AI Libraries
-langchain==0.1.0
-langchain-community==0.0.20
+langchain>=0.1.30
+langchain-community>=0.0.30
 llama-cpp-python==0.2.32
 
 # Model Download & Management
@@ -9,7 +9,7 @@ transformers==4.37.2
 
 # System Monitoring & Utilities
 psutil==5.9.8
-pydantic==2.5.3
+pydantic==2.7.0
 
 # CLI Enhancement
 rich==13.7.0
@@ -18,3 +18,6 @@ click==8.1.7
 # Standard Python Utilities
 requests==2.31.0
 pyyaml==6.0.1
+
+# LangGraph for memory/history
+langgraph
