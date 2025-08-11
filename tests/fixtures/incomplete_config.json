@@ -1,0 +1,8 @@
+{
+  "model": {
+    "repo": "test/incomplete-model"
+  },
+  "llm_params": {
+    "n_ctx": 1024
+  }
+}

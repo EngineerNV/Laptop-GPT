@@ -1,0 +1,25 @@
+{
+  "model": {
+    "repo": "test/model-repo",
+    "file": "test-model.gguf",
+    "cache_dir": "/tmp/test-cache"
+  },
+  "llm_params": {
+    "n_ctx": 1024,
+    "n_batch": 4,
+    "n_threads": 2,
+    "temperature": 0.5,
+    "max_tokens": 512,
+    "use_mlock": false,
+    "use_mmap": true,
+    "n_gpu_layers": 0
+  },
+  "environment": {
+    "llama_cpp_verbose": "0",
+    "ggml_log_level": "2"
+  },
+  "app": {
+    "name": "Test-GPT",
+    "version": "0.1.0"
+  }
+}
