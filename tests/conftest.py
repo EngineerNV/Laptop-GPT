@@ -61,3 +61,13 @@ def sample_llm_params():
         "use_mmap": True,
         "n_gpu_layers": 0
     }
+
+
+@pytest.fixture
+def main_config():
+    """Load the main configuration file for pipeline tests."""
+    try:
+        from config_utils import load_config
+        return load_config("config.json")
+    except FileNotFoundError:
+        pytest.skip("Main config.json not found - required for pipeline tests")

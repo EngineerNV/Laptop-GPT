@@ -1,18 +1,214 @@
 {
-  "model": {
-    "repo": "bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF",
-    "file": "DeepSeek-R1-Distill-Qwen-1.5B-Q5_K_M.gguf",
-    "cache_dir": ".models/deepseek"
+  "chat_selection": {
+    "profile": "llama3",
+    "model_id": "llama-3.2-1b",
+    "use_recommended": true
   },
-  "llm_params": {
+  "available_models": [
+    {
+      "id": "deepseek-r1-1.5b",
+      "name": "DeepSeek R1 Distill Qwen 1.5B (GGUF Q5_K_M)",
+      "model": {
+        "repo": "bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF",
+        "file": "DeepSeek-R1-Distill-Qwen-1.5B-Q5_K_M.gguf",
+        "cache_dir": ".models/deepseek"
+      },
+      "format": "gguf",
+      "quant": "Q5_K_M",
+      "context_len_hint": "4k-8k",
+      "notes": "Current model; balanced speed/quality for Qwen-style chat.",
+      "has_chat_template": true,
+      "recommended_profile": "deepseek",
+      "recommended_llm_params": {
+        "n_ctx": 1536,
+        "n_batch": 12,
+        "n_threads": 4,
+        "temperature": 0.3,
+        "max_tokens": 512,
+        "use_mlock": false,
+        "use_mmap": true,
+        "n_gpu_layers": 0
+      }
+    },
+    {
+      "id": "tinyllama-1.1b",
+      "name": "TinyLlama 1.1B Chat v1.0",
+      "model": {
+        "repo": "TheBloke/TinyLlama-1.1B-Chat-v1.0-GGUF",
+        "file": "tinyllama-1.1b-chat-v1.0.Q4_K_M.gguf",
+        "cache_dir": ".models/tinyllama"
+      },
+      "format": "gguf",
+      "quant": "Q4_K_M",
+      "context_len_hint": "4k",
+      "notes": "Ultra-fast, great for lightweight assistants and testing.",
+      "has_chat_template": true,
+      "recommended_profile": "zephyr",
+      "recommended_llm_params": {
+        "n_ctx": 1536,
+        "n_batch": 16,
+        "n_threads": 4,
+        "temperature": 0.3,
+        "max_tokens": 512,
+        "use_mlock": false,
+        "use_mmap": true,
+        "n_gpu_layers": 2
+      }
+    },
+    {
+      "id": "llama-3.2-1b",
+      "name": "Llama 3.2 1B Instruct",
+      "model": {
+        "repo": "bartowski/Llama-3.2-1B-Instruct-GGUF",
+        "file": "Llama-3.2-1B-Instruct-Q4_K_M.gguf",
+        "cache_dir": ".models/llama3.2-1b"
+      },
+      "format": "gguf",
+      "quant": "Q4_K_M",
+      "context_len_hint": "8k-128k",
+      "notes": "Tiny instruct model, very fast on Apple Silicon, multi-lingual.",
+      "has_chat_template": true,
+      "recommended_profile": "llama3",
+      "recommended_llm_params": {
+        "n_ctx": 1536,
+        "n_batch": 16,
+        "n_threads": 4,
+        "temperature": 0.3,
+        "max_tokens": 512,
+        "use_mlock": false,
+        "use_mmap": true,
+        "n_gpu_layers": 2
+      }
+    },
+    {
+      "id": "qwen-2.5-1.5b",
+      "name": "Qwen2.5 1.5B Instruct",
+      "model": {
+        "repo": "Qwen/Qwen2.5-1.5B-Instruct-GGUF",
+        "file": "qwen2.5-1.5b-instruct-q5_k_m.gguf",
+        "cache_dir": ".models/qwen2.5-1.5b"
+      },
+      "format": "gguf",
+      "quant": "Q5_K_M",
+      "context_len_hint": "32k",
+      "notes": "Multilingual, efficient; works well in low memory.",
+      "has_chat_template": true,
+      "recommended_profile": "chatml",
+      "recommended_llm_params": {
+        "n_ctx": 1536,
+        "n_batch": 10,
+        "n_threads": 4,
+        "temperature": 0.3,
+        "max_tokens": 512,
+        "use_mlock": false,
+        "use_mmap": true,
+        "n_gpu_layers": 0
+      }
+    },
+    {
+      "id": "mistral-7b",
+      "name": "Mistral 7B Instruct v0.3 (GGUF Q4)",
+      "model": {
+        "repo": "bartowski/Mistral-7B-Instruct-v0.3-GGUF",
+        "file": "Mistral-7B-Instruct-v0.3-Q4_K_M.gguf",
+        "cache_dir": ".models/mistral7b"
+      },
+      "format": "gguf",
+      "quant": "Q4_K_M",
+      "context_len_hint": "8k",
+      "notes": "Fast for a 7B on 8GB Air; pick Q4 for ~4-5 GB disk size.",
+      "has_chat_template": true,
+      "recommended_profile": "llama",
+      "recommended_llm_params": {
+        "n_ctx": 768,
+        "n_batch": 3,
+        "n_threads": 4,
+        "temperature": 0.3,
+        "max_tokens": 512,
+        "use_mlock": false,
+        "use_mmap": true,
+        "n_gpu_layers": 0
+      }
+    },
+    {
+      "id": "llama-3.1-8b",
+      "name": "Llama 3.1 8B Instruct (GGUF Q4_K_M)",
+      "model": {
+        "repo": "lmstudio-community/Meta-Llama-3.1-8B-Instruct-GGUF",
+        "file": "Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf",
+        "cache_dir": ".models/llama3.1-8b"
+      },
+      "format": "gguf",
+      "quant": "Q4_K_M",
+      "context_len_hint": "128k",
+      "notes": "Largest you can reasonably run on 8GB; ~4.9 GB file size.",
+      "has_chat_template": true,
+      "recommended_profile": "llama3",
+      "recommended_llm_params": {
+        "n_ctx": 640,
+        "n_batch": 2,
+        "n_threads": 4,
+        "temperature": 0.3,
+        "max_tokens": 512,
+        "use_mlock": false,
+        "use_mmap": true,
+        "n_gpu_layers": 0
+      }
+    }
+  ],
+  "custom_llm_params": {
     "n_ctx": 2048,
     "n_batch": 8,
     "n_threads": 6,
-    "temperature": 0.6,
-    "max_tokens": 1024,
+    "temperature": 0.3,
+    "max_tokens": 512,
     "use_mlock": false,
     "use_mmap": true,
     "n_gpu_layers": 0
+  },
+  "profiles": {
+    "deepseek": {
+      "format": "deepseek",
+      "stop_tokens": ["Question:", "Answer:", "User:", "Human:", "\n\n"],
+      "description": "DeepSeek models - direct Q&A format without reasoning"
+    },
+    "deepseek_reasoning": {
+      "format": "deepseek_chat", 
+      "stop_tokens": ["<|User|>"],
+      "show_thinking": false,
+      "description": "DeepSeek models with reasoning - shows only final answer"
+    },
+    "deepseek_show_reasoning": {
+      "format": "deepseek_chat", 
+      "stop_tokens": ["<|User|>"],
+      "show_thinking": true,
+      "description": "DeepSeek models with reasoning - shows full thinking process"
+    },
+    "llama": {
+      "format": "llama",
+      "stop_tokens": ["[INST]", "[/INST]", "User:", "Human:", "\n\n"],
+      "description": "Llama and Mistral models (legacy format)"
+    },
+    "llama3": {
+      "format": "llama3",
+      "stop_tokens": ["<|eot_id|>", "<|start_header_id|>"],
+      "description": "Llama 3.1+ models with newer header format"
+    },
+    "zephyr": {
+      "format": "zephyr",
+      "stop_tokens": ["<|system|>", "<|user|>", "<|assistant|>", "</s>", "\n\n"],
+      "description": "Zephyr format for TinyLlama and similar models"
+    },
+    "chatml": {
+      "format": "chatml",
+      "stop_tokens": ["<|im_start|>", "<|im_end|>", "User:", "Human:", "\n\n"],
+      "description": "ChatML format (GPT-4, many fine-tuned models)"
+    },
+    "generic": {
+      "format": "auto",
+      "stop_tokens": ["###", "Human:", "Assistant:", "\n\n"],
+      "description": "Universal format that works with most models"
+    }
   },
   "environment": {
     "llama_cpp_verbose": "0",

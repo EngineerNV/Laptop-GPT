@@ -4,7 +4,7 @@ Tests for llm_utils.py module.
 This module tests:
 - LLM setup with various parameters
 - Model downloading functionality
-- Prompt building for DeepSeek models
+- Prompt formatting for different model types
 - Error handling for missing models and invalid parameters
 """
 import pytest
@@ -16,7 +16,7 @@ from pathlib import Path
 # Import the modules to test
 import sys
 sys.path.append('..')
-from llm_utils import setup_llm, download_model, build_deepseek_prompt
+from llm_utils import setup_llm, download_model, format_prompt
 
 
 class TestSetupLLM:
@@ -24,19 +24,23 @@ class TestSetupLLM:
     
     def test_setup_llm_with_valid_model(self, mock_model_file, sample_llm_params):
         """Test setting up LLM with a valid model file."""
-        with patch('llm_utils.LlamaCpp') as mock_llama:
+        with patch('llm_utils.Llama') as mock_llama:
             mock_instance = MagicMock()
             mock_llama.return_value = mock_instance
             
             llm = setup_llm(mock_model_file, sample_llm_params, debug_mode=False)
             
-            # Verify LlamaCpp was called with correct parameters
+            # Verify Llama was called with correct parameters
             mock_llama.assert_called_once()
             call_args = mock_llama.call_args
             
             assert call_args[1]['model_path'] == mock_model_file
             assert call_args[1]['n_ctx'] == 1024
-            assert call_args[1]['temperature'] == 0.5
+            assert call_args[1]['n_batch'] == 4
+            assert call_args[1]['n_threads'] == 2
+            assert call_args[1]['use_mlock'] == False
+            assert call_args[1]['use_mmap'] == True
+            assert call_args[1]['n_gpu_layers'] == 0
             assert call_args[1]['verbose'] == False
             assert llm == mock_instance
 
@@ -52,7 +56,7 @@ class TestSetupLLM:
 
     def test_setup_llm_debug_mode(self, mock_model_file, sample_llm_params):
         """Test LLM setup in debug mode."""
-        with patch('llm_utils.LlamaCpp') as mock_llama:
+        with patch('llm_utils.Llama') as mock_llama:
             with patch.dict(os.environ, {}, clear=True):
                 setup_llm(mock_model_file, sample_llm_params, debug_mode=True)
                 
@@ -66,7 +70,7 @@ class TestSetupLLM:
 
     def test_setup_llm_production_mode(self, mock_model_file, sample_llm_params):
         """Test LLM setup in production mode (non-debug)."""
-        with patch('llm_utils.LlamaCpp') as mock_llama:
+        with patch('llm_utils.Llama') as mock_llama:
             with patch.dict(os.environ, {}, clear=True):
                 setup_llm(mock_model_file, sample_llm_params, debug_mode=False)
                 
@@ -91,18 +95,17 @@ class TestSetupLLM:
             "n_gpu_layers": 5
         }
         
-        with patch('llm_utils.LlamaCpp') as mock_llama:
+        with patch('llm_utils.Llama') as mock_llama:
             setup_llm(mock_model_file, custom_params)
             
             call_args = mock_llama.call_args[1]
             assert call_args['n_ctx'] == 4096
             assert call_args['n_batch'] == 16
             assert call_args['n_threads'] == 8
-            assert call_args['temperature'] == 0.8
-            assert call_args['max_tokens'] == 2048
             assert call_args['use_mlock'] == True
             assert call_args['use_mmap'] == False
             assert call_args['n_gpu_layers'] == 5
+            # Note: temperature and max_tokens are inference params, not model loading params
 
 
 class TestDownloadModel:
@@ -211,54 +214,54 @@ class TestDownloadModel:
         mock_console_instance.print.assert_called()
 
 
-class TestBuildDeepseekPrompt:
-    """Test DeepSeek prompt building functionality."""
+class TestFormatPrompt:
+    """Test prompt formatting functionality."""
     
-    def test_build_simple_prompt(self):
-        """Test building a simple prompt."""
+    def test_format_deepseek_chat_prompt(self):
+        """Test formatting a DeepSeek chat prompt."""
         user_message = "Hello, how are you?"
-        result = build_deepseek_prompt(user_message)
+        result = format_prompt(user_message, "deepseek_chat")
         
-        expected = "<｜User｜>Hello, how are you?<｜Assistant｜>"
+        expected = "<|User|>Hello, how are you?<|Assistant|>"
         assert result == expected
 
-    def test_build_prompt_with_special_characters(self):
-        """Test building prompt with special characters."""
+    def test_format_deepseek_prompt(self):
+        """Test formatting a DeepSeek reasoning prompt."""
         user_message = "What's 2+2? Please explain the math!"
-        result = build_deepseek_prompt(user_message)
+        result = format_prompt(user_message, "deepseek")
         
-        expected = "<｜User｜>What's 2+2? Please explain the math!<｜Assistant｜>"
+        expected = "Question: What's 2+2? Please explain the math!\nAnswer:"
         assert result == expected
 
-    def test_build_prompt_with_empty_message(self):
-        """Test building prompt with empty message."""
-        user_message = ""
-        result = build_deepseek_prompt(user_message)
+    def test_format_llama3_prompt(self):
+        """Test formatting a Llama3 prompt."""
+        user_message = "Hello world"
+        result = format_prompt(user_message, "llama3")
         
-        expected = "<｜User｜><｜Assistant｜>"
+        expected = "<|start_header_id|>system<|end_header_id|>\n\nYou are a helpful assistant.<|eot_id|><|start_header_id|>user<|end_header_id|>\n\nHello world<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
         assert result == expected
 
-    def test_build_prompt_with_multiline_message(self):
-        """Test building prompt with multiline message."""
+    def test_format_zephyr_prompt(self):
+        """Test formatting a Zephyr prompt."""
         user_message = "First line\nSecond line\nThird line"
-        result = build_deepseek_prompt(user_message)
+        result = format_prompt(user_message, "zephyr")
         
-        expected = "<｜User｜>First line\nSecond line\nThird line<｜Assistant｜>"
+        expected = "<|system|>\nYou are a helpful assistant.</s>\n<|user|>\nFirst line\nSecond line\nThird line</s>\n<|assistant|>\n"
         assert result == expected
 
-    def test_build_prompt_with_unicode(self):
-        """Test building prompt with unicode characters."""
+    def test_format_generic_prompt(self):
+        """Test formatting with generic/auto format."""
         user_message = "Hello 世界! How do you say 'hello' in Chinese?"
-        result = build_deepseek_prompt(user_message)
+        result = format_prompt(user_message, "auto")
         
-        expected = "<｜User｜>Hello 世界! How do you say 'hello' in Chinese?<｜Assistant｜>"
+        expected = "### Human: Hello 世界! How do you say 'hello' in Chinese?\n### Assistant:"
         assert result == expected
 
 
 class TestLLMUtilsIntegration:
     """Integration tests for LLM utilities."""
     
-    @patch('llm_utils.LlamaCpp')
+    @patch('llm_utils.Llama')
     @patch('llm_utils.hf_hub_download') 
     @patch('llm_utils.Console')
     def test_download_and_setup_workflow(self, mock_console, mock_hf_download, mock_llama, temp_dir):
@@ -297,4 +300,4 @@ class TestLLMUtilsIntegration:
         call_args = mock_llama.call_args[1]
         assert call_args['model_path'] == model_path
         assert call_args['n_ctx'] == 1024
-        assert call_args['temperature'] == 0.6
+        # Note: temperature is an inference param, not passed to Llama constructor

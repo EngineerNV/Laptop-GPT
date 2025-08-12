@@ -1,0 +1,53 @@
+{
+  "chat_selection": {
+    "model_id": "test-model",
+    "profile": "generic"
+  },
+  "available_models": [
+    {
+      "id": "test-model",
+      "name": "Test Model (Mock)",
+      "model": {
+        "repo": "test/mock-model",
+        "file": "mock-model.gguf",
+        "cache_dir": ".test_cache"
+      },
+      "format": "gguf",
+      "quant": "Q4_K_M",
+      "context_len_hint": "2k",
+      "notes": "Mock model for testing purposes only",
+      "has_chat_template": false,
+      "recommended_profile": "generic"
+    }
+  ],
+  "llm_params": {
+    "n_ctx": 256,
+    "n_batch": 2,
+    "n_threads": 1,
+    "temperature": 0.0,
+    "max_tokens": 20,
+    "use_mlock": false,
+    "use_mmap": true,
+    "n_gpu_layers": 0
+  },
+  "profiles": {
+    "generic": {
+      "format": "auto",
+      "stop_tokens": ["###", "Human:", "Assistant:", "\n\n"],
+      "description": "Universal format that works with most models"
+    },
+    "test": {
+      "format": "auto",
+      "stop_tokens": ["[END]"],
+      "description": "Test profile for validation"
+    }
+  },
+  "environment": {
+    "llama_cpp_verbose": "0",
+    "ggml_log_level": "2"
+  },
+  "app": {
+    "name": "Laptop-GPT-Test",
+    "version": "0.1.2-test"
+  }
+}

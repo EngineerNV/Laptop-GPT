@@ -63,8 +63,7 @@ class TestMainApplicationFlow:
 
     @patch('main.download_model')
     @patch('main.setup_llm')
-    @patch('builtins.input', side_effect=[':q'])  # Simulate user quitting
-    def test_main_successful_flow(self, mock_input, mock_setup_llm, mock_download, 
+    def test_main_successful_flow(self, mock_setup_llm, mock_download, 
                                 valid_config_path, temp_dir):
         """Test successful main application flow."""
         # Setup mocks
@@ -80,6 +79,8 @@ class TestMainApplicationFlow:
             with patch('main.Console') as mock_console_class:
                 mock_console = MagicMock()
                 mock_console_class.return_value = mock_console
+                # Mock the console.input to return ':q' to exit the app
+                mock_console.input.return_value = ':q'
                 
                 result = main.main()
                 
@@ -172,23 +173,24 @@ class TestConfigurationIntegration:
         with patch.object(sys, 'argv', test_args):
             with patch('main.download_model') as mock_download:
                 with patch('main.setup_llm') as mock_setup_llm:
-                    with patch('builtins.input', side_effect=[':q']):
-                        with patch('main.Console') as mock_console_class:
-                            mock_console = MagicMock()
-                            mock_console_class.return_value = mock_console
+                    with patch('main.Console') as mock_console_class:
+                        mock_console = MagicMock()
+                        mock_console_class.return_value = mock_console
+                        # Mock the console.input to return ':q' to exit the app
+                        mock_console.input.return_value = ':q'
+                        
+                        # Create a mock model file for the test
+                        mock_download.return_value = "/tmp/test_model.gguf"
+                        mock_setup_llm.return_value = MagicMock()
+                        
+                        with patch.dict(os.environ, {}, clear=True):
+                            result = main.main()
                             
-                            # Create a mock model file for the test
-                            mock_download.return_value = "/tmp/test_model.gguf"
-                            mock_setup_llm.return_value = MagicMock()
+                            # Should succeed
+                            assert result == 0
                             
-                            with patch.dict(os.environ, {}, clear=True):
-                                result = main.main()
-                                
-                                # Should succeed
-                                assert result == 0
-                                
-                                # Verify environment was set up
-                                assert "LLAMA_LOG_LEVEL" in os.environ
+                            # Verify environment was set up
+                            assert "LLAMA_LOG_LEVEL" in os.environ
 
 
 class TestUserInteraction:
@@ -204,7 +206,10 @@ class TestUserInteraction:
         mock_download.return_value = mock_model_path
         
         mock_llm = MagicMock()
-        mock_llm.invoke.return_value = "Test response from LLM"
+        # Mock the LLM to return the expected response format
+        mock_llm.return_value = {
+            "choices": [{"text": "Test response from LLM"}]
+        }
         mock_setup_llm.return_value = mock_llm
         
         # Simulate user input: one question, then quit
@@ -213,24 +218,24 @@ class TestUserInteraction:
         test_args = ['main.py', '--config', valid_config_path]
         
         with patch.object(sys, 'argv', test_args):
-            with patch('builtins.input', side_effect=user_inputs):
-                with patch('builtins.print') as mock_print:
-                    with patch('main.Console') as mock_console_class:
-                        mock_console = MagicMock()
-                        mock_console_class.return_value = mock_console
-                        
-                        result = main.main()
-                        
-                        # Should complete successfully
-                        assert result == 0
-                        
-                        # Verify LLM was invoked
-                        mock_llm.invoke.assert_called_once()
-                        
-                        # Verify response was printed
-                        response_printed = any("Test response from LLM" in str(call) 
-                                             for call in mock_print.call_args_list)
-                        assert response_printed
+            with patch('main.Console') as mock_console_class:
+                mock_console = MagicMock()
+                mock_console_class.return_value = mock_console
+                # Mock console.input to simulate user interaction
+                mock_console.input.side_effect = user_inputs
+                
+                result = main.main()
+                
+                # Should complete successfully
+                assert result == 0
+                
+                # Verify LLM was invoked (called directly, not via .invoke method)
+                mock_llm.assert_called_once()
+                
+                # Verify response was printed via console.print
+                response_printed = any("Test response from LLM" in str(call) 
+                                     for call in mock_console.print.call_args_list)
+                assert response_printed
 
     @patch('main.download_model')
     @patch('main.setup_llm')
@@ -250,18 +255,19 @@ class TestUserInteraction:
             test_args = ['main.py', '--config', valid_config_path]
             
             with patch.object(sys, 'argv', test_args):
-                with patch('builtins.input', return_value=quit_cmd):
-                    with patch('builtins.print') as mock_print:
-                        with patch('main.Console') as mock_console_class:
-                            mock_console = MagicMock()
-                            mock_console_class.return_value = mock_console
-                            
-                            result = main.main()
-                            
-                            # Should exit successfully
-                            assert result == 0
-                            
-                            # Should print goodbye message
-                            goodbye_printed = any("Exiting Laptop-GPT" in str(call) 
-                                                for call in mock_print.call_args_list)
-                            assert goodbye_printed
+                with patch('builtins.print') as mock_print:
+                    with patch('main.Console') as mock_console_class:
+                        mock_console = MagicMock()
+                        mock_console_class.return_value = mock_console
+                        # Mock console.input to return quit command
+                        mock_console.input.return_value = quit_cmd
+                        
+                        result = main.main()
+                        
+                        # Should exit successfully
+                        assert result == 0
+                        
+                        # Should print goodbye message
+                        goodbye_printed = any("Exiting Laptop-GPT" in str(call) 
+                                            for call in mock_print.call_args_list)
+                        assert goodbye_printed

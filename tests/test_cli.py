@@ -112,7 +112,7 @@ class TestGetConfigHelp:
         
         # Check for main configuration sections
         assert '"model"' in help_text
-        assert '"llm_params"' in help_text
+        assert '"custom_llm_params"' in help_text
         assert '"environment"' in help_text
         assert '"app"' in help_text
 
@@ -123,7 +123,7 @@ class TestGetConfigHelp:
         # Check for example values
         assert "n_ctx" in help_text
         assert "temperature" in help_text
-        assert "Example values:" in help_text
+        assert "Parameter Guidelines" in help_text
 
     def test_get_config_help_explanations(self):
         """Test that config help includes parameter explanations."""
