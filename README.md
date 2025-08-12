@@ -30,7 +30,8 @@ Instead of relying on embedded templates, Laptop-GPT gives you direct control:
 {
   "chat_selection": {
     "model_id": "deepseek-r1-1.5b",  // Model ID from catalog
-    "profile": "deepseek"            // Prompt format profile
+    "profile": "deepseek",           // Prompt format profile
+    "use_recommended": true          // Use model's recommended LLM parameters
   },
   "profiles": {
     "deepseek": {
@@ -97,11 +98,14 @@ Then edit your `config.json` to use a specific model:
 ```json
 {
   "chat_selection": {
-    "model_id": "tinyllama-1.1b",  // Model ID from catalog
-    "profile": "llama"             // Prompt format profile
+    "model_id": "tinyllama-1.1b",   // Model ID from catalog
+    "profile": "llama",             // Prompt format profile
+    "use_recommended": true         // Use model's recommended LLM parameters
   }
 }
 ```
+
+**About `use_recommended`**: When set to `true`, Laptop-GPT automatically uses the optimized parameters (`n_ctx`, `n_batch`, `temperature`, etc.) that are pre-configured for each model. This ensures optimal performance and memory usage for your hardware. You can override these by setting `use_recommended: false` and defining your own `custom_llm_params`.
 
 ### 5. List Available Profiles
 ```sh
@@ -212,8 +216,9 @@ Change models by updating your chat selection in `config.json`:
 ```json
 {
   "chat_selection": {
-    "model_id": "tinyllama-1.1b",  // Model ID from catalog
-    "profile": "llama"             // Prompt format profile
+    "model_id": "tinyllama-1.1b",   // Model ID from catalog
+    "profile": "llama",             // Prompt format profile
+    "use_recommended": true         // Use model's recommended LLM parameters
   }
 }
 ```
@@ -269,7 +274,8 @@ python main.py --list-profiles
 {
   "chat_selection": {
     "model_id": "tinyllama-1.1b",    // Model ID from catalog
-    "profile": "llama"               // Prompt format profile
+    "profile": "llama",              // Prompt format profile
+    "use_recommended": true          // Use model's recommended LLM parameters
   },
   "profiles": {
     "llama": {
@@ -288,7 +294,8 @@ Change both model and profile in your chat selection:
 {
   "chat_selection": {
     "model_id": "mistral-7b",       // Model ID from catalog
-    "profile": "llama"              // Prompt format profile
+    "profile": "llama",             // Prompt format profile
+    "use_recommended": true         // Use model's recommended LLM parameters
   }
 }
 ```
@@ -676,7 +683,8 @@ Edit `config.json` to customize:
 {
   "chat_selection": {
     "model_id": "deepseek-r1-1.5b", // Model ID from catalog
-    "profile": "deepseek_reasoning"  // Prompt format profile
+    "profile": "deepseek_reasoning", // Prompt format profile
+    "use_recommended": true          // Use model's recommended LLM parameters
   },
   "model": {
     "repo": "bartowski/DeepSeek-R1-Distill-Qwen-1.5B-GGUF",
@@ -716,8 +724,9 @@ python main.py --list-profiles     # List available prompt profiles
 ```json
 {
   "chat_selection": {
-    "model_id": "tinyllama-1.1b",  // Current model ID
-    "profile": "generic"           // Try universal format
+    "model_id": "tinyllama-1.1b",   // Current model ID
+    "profile": "generic",           // Try universal format
+    "use_recommended": true         // Use model's recommended LLM parameters
   }
 }
 ```
@@ -728,7 +737,8 @@ python main.py --list-profiles     # List available prompt profiles
 {
   "chat_selection": {
     "model_id": "deepseek-r1-1.5b", // Current model ID
-    "profile": "deepseek"           // Simple Q&A format
+    "profile": "deepseek",          // Simple Q&A format
+    "use_recommended": true         // Use model's recommended LLM parameters
   }
 }
 ```
@@ -920,7 +930,21 @@ A: Yes! Add them to `available_models` in `config.json`:
         "file": "model-file.gguf",
         "cache_dir": ".models/custom"
       },
-      "recommended_profile": "generic"
+      "format": "gguf",
+      "quant": "Q4_K_M",
+      "context_len_hint": "4k",
+      "notes": "Custom model for specific use case",
+      "recommended_profile": "generic",
+      "recommended_llm_params": {
+        "n_ctx": 1536,
+        "n_batch": 8,
+        "n_threads": 4,
+        "temperature": 0.3,
+        "max_tokens": 512,
+        "use_mlock": false,
+        "use_mmap": true,
+        "n_gpu_layers": 0
+      }
     }
   ]
 }
